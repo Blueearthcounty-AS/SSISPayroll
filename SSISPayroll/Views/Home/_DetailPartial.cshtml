@@ -1,0 +1,92 @@
+﻿@model System.Data.DataTable
+@using System.Data;
+
+
+    <div class="modal-dialog" style="max-width: 1350px!important;">
+        <div class="modal-content">
+            <div class="row">
+                <div class="col-md-12">
+                    <form>
+                        <div class="modal-header">
+                            <h5 class="modal-title">Employee full details</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="alert alert-dark" role="alert">
+                                <div class="row">
+                                    <div class="col-md-7"><h5>Employee Name: @ViewData["empl_name"]</h5></div>
+                                    <div class="col-md-2"><h5>Reg Hours: @ViewData["reg_hrs"]</h5></div>
+                                    <div class="col-md-2"><h5>Comp: @ViewData["comp"]</h5></div>
+                                    <div class="col-md-1"><a class="btn btn-outline-dark btn-sm" href="http://becsql2017/Reports_SSRS/report/BEC%20Human%20Services/Office%20Support/Payroll/SSISByEmplL1">Print</a></div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-7"><h5>Employee Number: @ViewData["empl_nbr"]</h5></div>
+                                    <div class="col-md-2"><h5>Hol Hours: @ViewData["hol_hrs"]</h5></div>
+                                    <div class="col-md-2"><h5>OT: @ViewData["ot"]</h5></div>
+                                    <div class="col-md-1"></div>
+                                </div>
+                            </div>
+                            <table class="table table-condensed table-striped table-bordered small" id="ssispayrollfulldetailtable">
+                                <thead>
+                                    <tr>
+
+                                        <th>Objt @*@Model.Columns[1]*@</th>
+                                        <th>Org Code @*@Model.Columns[2]*@</th>
+                                        <th>Act Date @*@Model.Columns[3]*@</th>
+                                        <th>Hours @*@Model.Columns[4]*@</th>
+                                        <th>Activity @*@Model.Columns[5]*@</th>
+                                        <th>Pay Code @*@Model.Columns[6]*@</th>
+                                        <th>COA Error @*@Model.Columns[7]*@</th>
+                                        <th>Org Error @*@Model.Columns[8]*@</th>
+                                        <th>Brass Error @*@Model.Columns[9]*@</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+
+                                    @foreach (DataRow row in Model.Rows)
+                                    {
+                                        <tr>
+                                            <td>@row[@Model.Columns[1]]</td>
+                                            <td>@row[@Model.Columns[2]]</td>
+                                            <td>@string.Format("{0:MM/dd/yyyy}", @row[@Model.Columns[3]])</td>
+                                            <td>@row[@Model.Columns[4]]</td>
+                                            <td>@row[@Model.Columns[5]]</td>
+                                            <td>@string.Format("{0:MM/dd/yyyy}", @row[@Model.Columns[6]])</td>
+                                            <td>@row[@Model.Columns[7]]</td>
+                                            <td>
+                                                @if(@row[@Model.Columns[8]] == null || @row[@Model.Columns[8]].ToString() == "" || @row[@Model.Columns[8]].ToString() == " ") { <p style="font-size:0.5vw;"> @row[@Model.Columns[8]] </p>}
+                                                else { <span class="badge badge-pill badge-warning"><p style="font-size:0.5vw;"> @row[@Model.Columns[8]]</p></span>}
+                                            </td> 
+                                            <td width="5%"><p style = "font-size:0.5vw;"><span class="badge badge-pill badge-warning">@row[@Model.Columns[9]]</span></p></td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    <div class="modal-footer">
+                                        @*<button type="button" class="btn btn-outline-dark btn-sm" data-dismiss="modal">Close</button>
+    <input type="submit" value="Create" class="btn btn-dark btn-sm" />*@
+</div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+@section Scripts {
+    <!-- For the DataTables grid -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.css">
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+
+    <script>
+        $(function () {
+
+            $(document).ready(function () {
+                $('#ssispayrollfulldetailtable').DataTable({
+                    "paging": true // false to disable pagination (or any other option)
+                });
+                $('.dataTables_length').addClass('bs-select');
+            });
+        })
+    </script>
+}

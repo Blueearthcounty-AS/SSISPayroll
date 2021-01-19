@@ -1,0 +1,75 @@
+﻿@model SSISPayroll.Models.SsisRoleBrassConversion
+@*<div data-role="page">
+        <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+    </div>*@
+<div class="modal-dialog">
+    <div class="modal-content">
+        <div class="row">
+            <div class="col-md-12">
+                <form id="myform" asp-action="Create">
+                    <div class="modal-header">
+                        <h5 class="modal-title">New Brass Code Conversion</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <input name="IsValid" value="@ViewData.ModelState.IsValid.ToString()" />
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <div class="form-group">
+                            <label asp-for="SsisRoleId" class="control-label"></label>
+                            <input id="ssisroleid" asp-for="SsisRoleId" class="form-control" />
+                            <span asp-validation-for="SsisRoleId" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Brass" class="control-label"></label>
+                            <input id="brass" asp-for="Brass" class="form-control" />
+                            <span asp-validation-for="Brass" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="OrgCode" class="control-label"></label>
+                            <input id="orgcode" asp-for="OrgCode" class="form-control" />
+                            <span asp-validation-for="OrgCode" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-dark btn-sm" data-dismiss="modal">Close</button>
+                        <input type="submit" id="btnSaveIt" data-save="modal" class="btn btn-dark btn-sm" />
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        $("#btnSaveIt").on("click", function () {
+
+            event.preventDefault();
+
+            var form = $(this).parents('.modal').find('form');
+            var actionUrl = form.attr('action');
+            var dataToSend = form.serialize();
+
+            $.post(actionUrl, dataToSend).done(function (data) {
+                var newBody = $('.modal-body', data);
+                $('#crudContainer').find('.modal-body').replaceWith(newBody);
+
+                var isValid = newBody.find('[name="IsValid"]').val() == 'True';
+                if (isValid) {
+                    window.location = '@Url.Action("Index", "BrassCodeConversion")'
+                    $('#crudModal').modal('hide');
+                }
+
+            });
+
+        });
+
+
+
+    });
+</script>
+
+
+

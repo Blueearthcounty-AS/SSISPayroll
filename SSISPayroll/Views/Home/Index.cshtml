@@ -1,0 +1,127 @@
+﻿@model System.Data.DataTable
+@using System;
+@using System.Data;
+@using System.Globalization;
+
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="mainWindow" align="center" id="loader"><img src="~/assets/loader4.gif" /><b>Loading. Please wait...</b></div>
+<div class="mainWindow1" align="center" id="blank"><img src="~/assets/blank.png" /></div>
+<br />
+
+<div id="table_view">
+    <table class="table table-condensed table-striped table-bordered small" id="payrollListTable" width="100%">
+        <thead>
+            <tr>
+                <th>Begin Date</th>
+                <th>Begin Date</th>
+                <th>End Date</th>
+                <th>Holiday Hours</th>
+                <th>Pay Day</th>
+                <th>Pay Day</th>
+                <th>SSIS Payroll</th>
+            </tr>
+
+        </thead>
+        <tbody>            
+            @foreach (DataRow row in Model.Rows)
+            {
+                <tr>
+                    <td>@string.Format("{0:yyyy/MM/dd}", @row[@Model.Columns["begin_date"]])</td>
+                    <td>@string.Format("{0:MM/dd/yyyy}", @row[@Model.Columns["begin_date"]])</td>
+                    <td>@string.Format("{0:MM/dd/yyyy}", @row[@Model.Columns["end_date"]])</td>
+                    <td>@row[@Model.Columns["hol_hours"]]</td>
+                    <td>@string.Format("{0:MM/dd/yyyy}", @row[@Model.Columns["date_paid"]])</td>
+                    <td>@string.Format("{0:yyyy/MM/dd}", @row[@Model.Columns["date_paid"]])</td>
+                    <td width="12%"><input type="button" class="btn btn-outline-dark btn-sm editCrud" value="SSIS Detail"></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+
+
+@section Scripts {
+    <!-- For the DataTables grid -->
+
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.css">
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript">
+
+        var modal, loading;
+        //function ShowProgress() {
+
+        //    $(window).resize(function () {
+
+        //        modal = document.createElement("DIV");
+        //        modal.className = "modal";
+        //        document.body.appendChild(modal);
+        //        loading = document.getElementsByClassName("loading")[0];
+        //        loading.style.top = $(window).width() / 2 - $('.mainWindow').width() / 2 + "px";
+        //        loading.style.left = $(window).height() / 2 - $('.mainWindow').height() / 2 + "px"
+
+        //    });
+
+        //    ShowProgress();
+        //};
+
+        $(function() {
+
+            $(document).ready(function () {
+                $("#loader").hide();
+                $("#blank").hide();
+                var today = new Date();
+                var dd = String(today.getDate()).padStart(2, '0');
+                var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+                var yyyy = today.getFullYear();
+
+                today = yyyy + '/' + mm + '/' + dd;
+
+                $('#payrollListTable').DataTable({
+                    "columnDefs": [{ "targets": [0], "visible": false, "searchable": false }, { "targets": [5], "visible": false, "searchable": false }],
+                    "paging": true, // false to disable pagination (or any other option)
+                    "order": [[0, 'asc'], [1, 'asc']],
+                    "createdRow": function (row, data, dataIndex) { if (today > data[0] && today <= data[5]) { $(row).addClass('p-3 mb-2 bg-info text-white border border-success'); } }
+                });
+                $('.dataTables_length').addClass('bs-select');
+            });
+        });
+
+        $('#payrollListTable').on("click", ".editCrud", function (event) {
+
+            var row = $(this).closest("TR");
+            var from = $("TD", row).eq(0).html();
+            var to= $("TD", row).eq(1).html();
+
+            $.ajaxSetup({
+                global: false,
+                type: "GET",
+                type: "POST",
+                url: "@Url.Action("Detail")",
+                data: { date1: from, date2: to },
+                dataType: "text",
+                beforeSend: function () {
+                    $("#loader").show();
+                    $("#blank").show();
+
+                },
+                complete: function () {
+                    $("#loader").hide();
+                    $("#blank").hide();
+                }
+            });
+            $.ajax({
+                success: function (data) {
+                    window.location = '@Url.Action("Detail", "Home")'
+                },
+                error: function (req, status, error) {
+                    console.log("uhg!!!");
+                }
+            });
+        });
+    </script>
+    
+}

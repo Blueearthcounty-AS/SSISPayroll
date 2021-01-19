@@ -1,0 +1,106 @@
+﻿@model System.Data.DataTable
+@using System.Data;
+
+@{
+    ViewData["Title"] = "Detail Page";
+}
+<h3>Detail</h3>
+<br />
+<div class="row">
+    <div class="col-sm-2"><a class="btn btn-outline-dark btn-sm" id="btncreatefile">Create File to Import</a></div>
+    <div class="col-sm-3" id="status"><label class="control-label">Your file was sucessfully created!</label></div>
+    
+</div>
+
+<br />
+<div>
+    <table class="table table-condensed table-striped table-bordered small" id="ssispayrolldetailtable">
+        <thead>
+            <tr>
+                <th></th>
+                <th>Employee #</th>
+                <th>Employee Name</th>
+                <th>Total Hours</th>
+                <th>Regular</th>
+                <th>Comp</th>
+                <th>Hol Hours</th>
+                @*<th>Warn</th>
+                <th>Case</th>*@
+                <th>Fatal Org Errors</th>
+            </tr>
+        </thead>
+        <tbody>
+
+            @foreach (DataRow row in Model.Rows)
+            {
+                <tr>
+                    <td><a class="btn btn-outline-dark btn-sm fulldetail" data-toggle="modal" asp-action="SSISPayrollFullDetail" asp-route-employeenbr="@row[@Model.Columns[0]].ToString()">Select</a></td>
+                    <td>@row[@Model.Columns["empl_nbr"]]</td>
+                    <td>@row[@Model.Columns["empl_name"]]</td>
+                    <td>@row[@Model.Columns["tot_time"]]</td>
+                    <td>@row[@Model.Columns["regular"]]</td>
+                    <td>@row[@Model.Columns["comp"]]</td>
+                    <td>@row[@Model.Columns["ts"]]</td>
+                    @*<td>@row[@Model.Columns["coa_errors"]]</td>
+                    <td>@row[@Model.Columns["case_errors"]]</td>*@
+                    <td>@row[@Model.Columns["org_errors"]]</td>
+
+
+                </tr>
+            }
+        </tbody>
+    </table>
+    <div class="modal fade in" id="fullDetailModal" tabindex="-1" role="dialog" aria-labelledby="fulldetailModal" aria-hidden="true">
+        <div id="fulldetailContainer">
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- For the DataTables grid -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.css">
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+
+    <script type="text/javascript">
+        $(function () {
+
+            $(document).ready(function () {
+                $("#status").hide(); 
+
+                $('#ssispayrolldetailtable').DataTable({
+                    "paging": true // false to disable pagination (or any other option)
+
+                });
+                $('.dataTables_length').addClass('bs-select');
+
+
+                $('#ssispayrollfulldetailtable').DataTable({
+                });
+                $('.dataTables_length').addClass('bs-select');
+            });
+
+            $('#ssispayrolldetailtable').on("click", ".fulldetail", function (event) {
+                event.preventDefault();
+                var url = $(this).attr("href");
+                $.get(url, function (data) {
+                    $('#fulldetailContainer').html(data);
+                    $('#fullDetailModal').modal('show');
+                });
+                
+            });
+
+            $("#btncreatefile").on("click", function () {
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("SSIStoMunis")",
+                    dataType: "text",
+                    success: function () { $("#status").show(); },
+                    error: function (req, status, error) { console.log("uhg!!!"); }
+                });
+            });
+        });
+
+    </script>
+
+
+}

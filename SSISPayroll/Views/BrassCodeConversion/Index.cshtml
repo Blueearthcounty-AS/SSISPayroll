@@ -1,0 +1,126 @@
+﻿@model IEnumerable<SSISPayroll.Models.SsisRoleBrassConversion>
+@{
+    ViewData["Title"] = "Index";
+}
+<h3>Brass Code Conversion</h3>
+<br />
+<div class="row">
+    <div class="col-md-6">
+        <a class="btn btn-dark btn-sm" data-toggle="modal" asp-action="Create" id="btnCreate">New Brass Code Conversion</a>
+    </div>
+</div>
+<br />
+<table class="table table-condensed table-striped table-bordered small" id="brassroleconversiontable">
+    <thead>
+        <tr>
+            @*<th>
+
+                    @Html.DisplayNameFor(model => model.SsisRoleBrassConversionId)
+                </th>*@
+            <th>
+                SSIS Role Id
+                @*@Html.DisplayNameFor(model => model.SsisRoleId)*@
+            </th>
+            <th>
+                Brass
+                @*@Html.DisplayNameFor(model => model.Brass)*@
+            </th>
+            <th>
+                Org Code
+                @*@Html.DisplayNameFor(model => model.OrgCode)*@
+            </th>
+            <th width="15%">
+
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                @*<td width="20%">
+                        @Html.DisplayFor(modelItem => item.SsisRoleBrassConversionId)
+                    </td>*@
+                <td width="20%">
+                    @Html.DisplayFor(modelItem => item.SsisRoleId)
+                </td>
+                <td width="20%">
+                    @Html.DisplayFor(modelItem => item.Brass)
+                </td>
+                <td width="20%">
+                    @Html.DisplayFor(modelItem => item.OrgCode)
+                </td>
+                <td width="15%">
+                    <a class="btn btn-outline-dark btn-sm editCrud" data-toggle="modal" asp-action="Edit" asp-route-id="@item.SsisRoleBrassConversionId">Edit</a> |
+                    <a class="btn btn-outline-danger btn-sm deleteCrud" data-toggle="modal" asp-action="Delete" asp-route-id="@item.SsisRoleBrassConversionId">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<!-- Modal -->
+<div class="modal fade in" id="crudModal" tabindex="-1" role="dialog" aria-labelledby="createModal" aria-hidden="true">
+    <div id="crudContainer">
+    </div>
+</div>
+
+
+@section Scripts {
+
+    <!-- For the DataTables grid -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.css">
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+
+    <!-- Page-specific script -->
+
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <script type="text/javascript">
+        $(function () {
+            var placeholderElement = $('#crudContainer');
+
+            $(document).ready(function () {
+                $('#brassroleconversiontable').DataTable({
+                    "paging": true // false to disable pagination (or any other option)
+                });
+                $('.dataTables_length').addClass('bs-select');
+            });
+
+
+
+            $("#btnCreate").on("click", function () {
+                $('#crudContainer').load(this.href, function () {
+
+                    $('#crudModal').modal('show');
+                });
+                return false;
+            });
+
+            $('#brassroleconversiontable').on("click", ".editCrud", function (event) {
+                event.preventDefault();
+                var url = $(this).attr("href");
+                $.get(url, function (data) {
+                    $('#crudContainer').html(data);
+                    $('#crudModal').modal('show');
+                });
+            });
+
+            $('#brassroleconversiontable').on("click", ".deleteCrud", function (event) {
+                event.preventDefault();
+                var url = $(this).attr("href");
+                $.get(url, function (data) {
+                    $('#crudContainer').html(data);
+                    $('#crudModal').modal('show');
+                });
+            });
+
+        });
+
+
+    </script>
+
+    
+        @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+   
+}

@@ -1,0 +1,110 @@
+﻿@model System.Data.DataTable
+@using System;
+@using System.Data;
+@using System.Globalization;
+
+@{
+    ViewData["Title"] = "Home Page";
+}
+<div class="row">
+    <a class="btn btn-outline-dark btn-sm" data-toggle="modal" asp-action="AddPayPeriod" id="btntable">Add Pay Periods</a>
+</div>
+<br />
+
+<div id="table_view">
+    <table class="table table-condensed table-striped table-bordered small" id="payrollListTable" width="100%">
+        <thead>
+            <tr>
+                <th>Begin Date</th>
+                <th>Begin Date</th>
+                <th>End Date</th>
+                <th>Holiday Hours</th>
+                <th>Pay Day</th>
+                <th>Pay Day</th>
+                <th></th>
+            </tr>
+
+        </thead>
+        <tbody>
+            @foreach (DataRow row in Model.Rows)
+            {
+                <tr>
+                    <td>@string.Format("{0:yyyy/MM/dd}", @row[@Model.Columns["begin_date"]])</td>
+                    <td>@string.Format("{0:MM/dd/yyyy}", @row[@Model.Columns["begin_date"]])</td>
+                    <td>@string.Format("{0:MM/dd/yyyy}", @row[@Model.Columns["end_date"]])</td>
+                    <td>@row[@Model.Columns["hol_hours"]]</td>
+                    <td>@string.Format("{0:MM/dd/yyyy}", @row[@Model.Columns["date_paid"]])</td>
+                    <td>@string.Format("{0:yyyy/MM/dd}", @row[@Model.Columns["date_paid"]])</td>
+                    <td width="12%"><input type="button" class="btn btn-outline-dark btn-sm editCrud" value="Edit"></td>
+                    @*<td width="12%">@Html.ActionLink("SSIS Detail", "Detail", "Home", new { date1 = row[Model.Columns["begin_date"]], date2 = row[Model.Columns["end_date"]] }, new { @class = "btn btn-outline-dark btn-sm editCrud", data_modal = "sodetails" })</td>*@
+
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+
+
+@section Scripts {
+
+
+    <!-- For the DataTables grid -->
+
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.css">
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+    @*<script src="https://cdn.datatables.net/plug-ins/1.10.19/sorting/datetime-moment.js"></script>*@
+
+    <link rel="stylesheet" href="~/lib/Year-Calendar-Bootstrap-4/jquery.bootstrap.year.calendar.min.css">
+    <script src="~/lib/Year-Calendar-Bootstrap-4/jquery.bootstrap.year.calendar.min.js"></script>
+
+    <script>
+        $(function () {
+            $("#loader").hide();
+            $(document).ready(function () {
+
+                var today = new Date();
+                var dd = String(today.getDate()).padStart(2, '0');
+                var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+                var yyyy = today.getFullYear();
+
+                today = yyyy + '/' + mm + '/' + dd;
+
+                $('#table_view').show();
+                $('#calendar_view').hide();
+                $('#payrollListTable').DataTable({
+                    "columnDefs": [{ "targets": [0], "visible": false, "searchable": false }, { "targets": [5], "visible": false, "searchable": false }],
+                    "paging": true, // false to disable pagination (or any other option)
+                    "order": [[0, 'asc'], [1, 'asc']],
+                    "createdRow": function (row, data, dataIndex) { if (today >= data[0] && today <= data[5]) { $(row).addClass('p-3 mb-2 bg-info text-white border border-success'); } }
+                });
+                $('.dataTables_length').addClass('bs-select');
+            });
+        })
+
+        $('#payrollListTable').on("click", ".editCrud", function (event) {
+
+            var row = $(this).closest("TR");
+            var from = $("TD", row).eq(0).html();
+            var to= $("TD", row).eq(1).html();
+
+            $("#loader").show();
+
+            $.ajax({
+                    type: "GET",
+                    url: "@Url.Action("Detail")",
+                data: { date1: from, date2: to },
+                dataType: "text",
+                success: function (data) {
+                    $("#loader").hide();
+                    window.location.href = "https://localhost:44380/Home/Detail";
+                    $("#loader").hide();
+                    //window.location.href = data.newUrl /*$('body').html(data)*/;
+                },
+                    error: function (req, status, error) { console.log("uhg!!!");}
+            });
+        });
+    </script>
+
+
+}
